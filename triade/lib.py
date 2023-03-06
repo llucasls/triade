@@ -29,4 +29,4 @@ def write(data: object, data_format: str) -> str:
     if data_format not in writers:
         raise ValueError("format not recognized")
 
-    return writers[data_format](data)
+    return writers[data_format](data).strip()
