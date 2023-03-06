@@ -51,9 +51,6 @@ def main():
 
     input_data = input_file.read()
 
-    print(output_format, file=sys.stderr)
-    print(output_ext, file=sys.stderr)
-
     if output_format is None:
         output_data = parse(input_data, input_format)
     elif output_ext is not None and output_format not in FORMAT_LIST:
