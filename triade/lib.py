@@ -18,11 +18,16 @@ writers = {
 }
 
 
-def parse(data: str, data_format: str) -> object:
+def parse(input_data: str, data_format: str) -> object:
     if data_format not in parsers:
         raise ValueError("format not recognized")
 
-    return parsers[data_format](data)
+    output_data = parsers[data_format](input_data)
+
+    if data_format != "json":
+        output_data = json.loads(json.dumps(output_data))
+
+    return output_data
 
 
 def write(data: object, data_format: str) -> str:
