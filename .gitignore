@@ -3,3 +3,4 @@ __pycache__/
 *.yml
 *.yaml
 *.toml
+!pyproject.toml
