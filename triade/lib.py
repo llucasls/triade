@@ -30,8 +30,8 @@ def parse(input_data: str, data_format: str) -> object:
     return output_data
 
 
-def write(data: object, data_format: str) -> str:
+def write(input_data: object, data_format: str) -> str:
     if data_format not in writers:
         raise ValueError("format not recognized")
 
-    return writers[data_format](data).strip()
+    return writers[data_format](input_data).strip()
