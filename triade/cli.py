@@ -9,7 +9,7 @@ FORMAT_LIST = ["json", "yaml", "toml"]
 
 
 def main():
-    parser = argparse.ArgumentParser(exit_on_error=False)
+    parser = argparse.ArgumentParser()
     parser.add_argument("input_file", nargs="?", type=argparse.FileType("r"),
                         default=sys.stdin)
     parser.add_argument("-o", "--output-file", type=argparse.FileType("w"),
