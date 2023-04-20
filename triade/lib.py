@@ -13,7 +13,8 @@ parsers = {
 
 writers = {
     "json": json.dumps,
-    "yaml": yaml.safe_dump,
+    "yaml": lambda data: yaml.dump(data, Dumper=yaml.SafeDumper,
+                                   allow_unicode=True),
     "toml": toml.dumps,
 }
 
