@@ -4,3 +4,4 @@ __pycache__/
 *.yaml
 *.toml
 !pyproject.toml
+dist/
