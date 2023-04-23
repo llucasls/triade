@@ -54,7 +54,8 @@ def main():
         output_data = parse(input_data, input_format)
     elif output_ext is not None and output_format not in FORMAT_LIST:
         output_data = parse(input_data, input_format)
-        print("Warning")
+        print("Warning: the output file's format is not recognized. Defaulting to object as standard format.",
+              file=sys.stderr)
     else:
         parsed_data = parse(input_data, input_format)
         output_data = write(parsed_data, output_format)
