@@ -2,6 +2,7 @@ toml
 PyYAML
 
 bumpline
+black
 
 pytest
 pytest-cov
