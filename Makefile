@@ -43,11 +43,7 @@ $(VENV): dev_requirements.txt
 	touch $(VENV)
 
 test: $(VENV)
-	$(TAR) $(TAR_FLAGS) $(SRC_FILES)
-	-$(ACTIVATE); $(PIP) install $(SRC_ARCHIVE); \
-	$(PYTEST) $(PYTEST_FLAGS) $(PYTEST_FILES); \
-	$(PIP) uninstall triade --yes &> /dev/null
-	-rm $(SRC_ARCHIVE)
+	$(ACTIVATE) && $(PYTEST) $(PYTEST_FLAGS) $(PYTEST_FILES)
 
 coverage: $(VENV)
 	FLAGS="--cov=$(COVERAGE_DIR)"; \
