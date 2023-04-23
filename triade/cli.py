@@ -2,7 +2,7 @@
 import sys
 import argparse
 
-from lib import parse, write
+from triade.lib import parse, write
 
 
 FORMAT_LIST = ["json", "yaml", "toml"]
