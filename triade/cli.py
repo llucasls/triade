@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 import argparse
 
@@ -63,7 +62,3 @@ def main():
     print(output_data, file=output_file)
 
     return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
