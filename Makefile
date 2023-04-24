@@ -16,7 +16,7 @@ COVERAGE_DIR = triade/
 TAR       = tar
 TAR_FLAGS = --create --file=$(SRC_ARCHIVE)
 
-SRC_FILES    = pyproject.toml README.md triade/*.py tests/*.py
+SRC_FILES    = pyproject.toml README.md triade/*.py
 SRC_ARCHIVE := $(shell mktemp --dry-run --suffix=.tar)
 
 dist:
@@ -49,6 +49,9 @@ coverage: $(VENV)
 	FLAGS="--cov=$(COVERAGE_DIR)"; \
 	$(MAKE) --no-print-directory test PYTEST_FLAGS="$${FLAGS}" 2> /dev/null
 
-.PHONY: build check publish clean install test coverage
+tar:
+	$(TAR) --create --file=triade.tar $(SRC_FILES)
+
+.PHONY: build check publish clean install test coverage tar
 
 .SILENT: build check publish install test coverage $(VENV)
