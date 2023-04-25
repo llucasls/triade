@@ -24,3 +24,24 @@ class TestJSON:
         expected_output = '[{"sandwich": "Big Mac", "drink": "Coca Cola", "dessert": "vanilla ice cream"}, {"sandwich": "Mc Chicken", "drink": "vanilla McShake", "dessert": "apple pie"}]'
 
         assert output_data == expected_output
+
+    def test_parse(self):
+        "return Python object from JSON string"
+
+        input_data = '[{"sandwich": "Big Mac", "drink": "Coca Cola", "dessert": "vanilla ice cream"}, {"sandwich": "Mc Chicken", "drink": "vanilla McShake", "dessert": "apple pie"}]'
+        output_data = parse(input_data, "json")
+
+        expected_output = [
+            {
+                "sandwich": "Big Mac",
+                "drink": "Coca Cola",
+                "dessert": "vanilla ice cream",
+            },
+            {
+                "sandwich": "Mc Chicken",
+                "drink": "vanilla McShake",
+                "dessert": "apple pie",
+            },
+        ]
+
+        assert output_data == expected_output
