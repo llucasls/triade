@@ -28,3 +28,28 @@ class TestYAML:
   sandwich: Mc Chicken"""
 
         assert output_data == expected_output
+
+    def test_parse(self):
+        "return Python object from YAML string"
+
+        input_data = """- dessert: vanilla ice cream
+  drink: Coca Cola
+  sandwich: Big Mac
+- dessert: apple pie
+  drink: vanilla McShake
+  sandwich: Mc Chicken"""
+        output_data = parse(input_data, "yaml")
+        expected_output = [
+            {
+                "sandwich": "Big Mac",
+                "drink": "Coca Cola",
+                "dessert": "vanilla ice cream",
+            },
+            {
+                "sandwich": "Mc Chicken",
+                "drink": "vanilla McShake",
+                "dessert": "apple pie",
+            },
+        ]
+
+        assert output_data == expected_output
