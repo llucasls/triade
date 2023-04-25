@@ -7,7 +7,7 @@ class TestTOML:
     def test_write(self):
         "return TOML string from Python object"
 
-        input_data = {"pedido": [
+        input_data = {"order": [
             {
                 "sandwich": "Big Mac",
                 "drink": "Coca Cola",
@@ -21,12 +21,12 @@ class TestTOML:
         }
         output_data = write(input_data, "toml")
 
-        expected_output = '''[[pedido]]
+        expected_output = '''[[order]]
 sandwich = "Big Mac"
 drink = "Coca Cola"
 dessert = "vanilla ice cream"
 
-[[pedido]]
+[[order]]
 sandwich = "Mc Chicken"
 drink = "vanilla McShake"
 dessert = "apple pie"'''
@@ -36,18 +36,18 @@ dessert = "apple pie"'''
     def test_parse(self):
         "return Python object from TOML string"
 
-        input_data = '''[[pedido]]
+        input_data = '''[[order]]
 sandwich = "Big Mac"
 drink = "Coca Cola"
 dessert = "vanilla ice cream"
 
-[[pedido]]
+[[order]]
 sandwich = "Mc Chicken"
 drink = "vanilla McShake"
 dessert = "apple pie"'''
         output_data = parse(input_data, "toml")
 
-        expected_output = {"pedido": [
+        expected_output = {"order": [
             {
                 "sandwich": "Big Mac",
                 "drink": "Coca Cola",
