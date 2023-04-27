@@ -19,6 +19,19 @@ TAR_FLAGS = --create --file=$(SRC_ARCHIVE)
 SRC_FILES    = pyproject.toml README.md triade/*.py
 SRC_ARCHIVE := $(shell mktemp --dry-run --suffix=.tar)
 
+PACKAGE_DIR := .venv/lib/python3.10/site-packages/triade
+
+define DELETED_FILES
+$(strip
+	$(foreach FILE,
+		$(filter-out
+		$(notdir $(wildcard triade/*.py)),
+		$(notdir $(wildcard .venv/lib/python3.10/site-packages/triade/*.py))),
+		$(CURDIR)/.venv/lib/python3.10/site-packages/triade/$(FILE)
+	)
+)
+endef
+
 dist:
 	mkdir dist
 
@@ -52,6 +65,16 @@ coverage: $(VENV)
 tar:
 	$(TAR) --create --file=triade.tar $(SRC_FILES)
 
+this: $(VENV)
+	-rm -f $(DELETED_FILES)
+	$(MAKE) --no-print-directory $(patsubst triade/%.py,$(PACKAGE_DIR)/%.py,$(wildcard triade/*.py))
+
+$(PACKAGE_DIR):
+	@mkdir -p $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/%.py: triade/%.py | $(PACKAGE_DIR)
+	ln $< $@
+
 .PHONY: build check publish clean install test coverage tar
 
-.SILENT: build check publish install test coverage $(VENV)
+.SILENT: build check publish install test coverage $(VENV) this
