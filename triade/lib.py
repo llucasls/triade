@@ -5,6 +5,15 @@ import yaml
 import toml
 
 
+def write_toml(input_data: object) -> str:
+    if not isinstance(input_data, dict):
+        print("Error: input data for TOML writer should be a dictionary",
+              file=sys.stderr)
+        sys.exit(1)
+
+    return toml.dumps(input_data)
+
+
 parsers = {
     "json": json.loads,
     "yaml": yaml.safe_load,
@@ -15,7 +24,7 @@ writers = {
     "json": json.dumps,
     "yaml": lambda data: yaml.dump(data, Dumper=yaml.SafeDumper,
                                    allow_unicode=True),
-    "toml": toml.dumps,
+    "toml": write_toml,
 }
 
 
