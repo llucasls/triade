@@ -61,6 +61,22 @@ class Element(dict):
     def text(self):
         return self.get("text")
 
+    @tag.setter
+    def tag(self, value):
+        self["tag"] = value
+
+    @attributes.setter
+    def attributes(self, value):
+        self["attributes"] = value
+
+    @children.setter
+    def children(self, value):
+        self["children"] = value
+
+    @text.setter
+    def text(self, value):
+        self["text"] = value
+
     @classmethod
     def is_element(cls: Type["Element"], obj: dict) -> bool:
         tag = obj.get("tag")
@@ -97,10 +113,10 @@ class Element(dict):
 
         return True
 
-    def get_children_str(self, parent: Type["Element"]) -> str:
+    def _get_children_str(self, parent: Type["Element"]) -> str:
         return [str(child) + "\n" for child in parent.children]
 
-    def clean(self, value: str) -> str:
+    def _clean(self, value: str) -> str:
         return (
             value.replace("u'", "'")
             .replace("'<", "<")
@@ -110,17 +126,17 @@ class Element(dict):
 
     def __str__(self):
         if self.attributes and self.children:
-            return self.clean(
-                make_repr("tag", "attributes", children=self.get_children_str)(self)
+            return self._clean(
+                make_repr("tag", "attributes", children=self._get_children_str)(self)
             )
         elif self.attributes and self.text:
-            return self.clean(make_repr("tag", "attributes", "text")(self))
+            return self._clean(make_repr("tag", "attributes", "text")(self))
         elif self.attributes:
-            return self.clean(make_repr("tag", "attributes")(self))
+            return self._clean(make_repr("tag", "attributes")(self))
         elif self.children:
-            return self.clean(make_repr("tag", children=self.get_children_str)(self))
+            return self._clean(make_repr("tag", children=self._get_children_str)(self))
         elif self.text:
-            return self.clean(make_repr("tag", "text")(self))
+            return self._clean(make_repr("tag", "text")(self))
 
         return make_repr("tag")(self)
 
