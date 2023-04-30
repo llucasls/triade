@@ -77,6 +77,18 @@ class Element(dict):
     def text(self, value):
         self["text"] = value
 
+    @attributes.deleter
+    def attributes(self):
+        del self["attributes"]
+
+    @children.deleter
+    def children(self):
+        del self["children"]
+
+    @text.deleter
+    def text(self):
+        del self["text"]
+
     @classmethod
     def is_element(cls: Type["Element"], obj: dict) -> bool:
         tag = obj.get("tag")
