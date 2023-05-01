@@ -1,4 +1,5 @@
 from typing import List, Dict, Type
+import re
 
 from magic_repr import make_repr
 
@@ -10,8 +11,18 @@ class Element(dict):
     text: str
 
     def __init__(
-        self, element=None, /, attributes=None, children=None, text=None, *, tag=None
+        self,
+        element=None,
+        /,
+        attributes=None,
+        children=None,
+        text=None,
+        *,
+        tag=None,
+        level=0,
     ):
+        self._level = level
+
         if isinstance(element, dict):
             if tag or attributes or children or text:
                 raise ValueError(
@@ -24,7 +35,12 @@ class Element(dict):
                 if key not in ["tag", "attributes", "children", "text"]:
                     raise ValueError(f"Unrecognized dictionary key: {key}")
 
-                self[key] = value
+                if key == "children":
+                    self["children"] = [
+                        Element(child, level=(level + 1)) for child in value
+                    ]
+                else:
+                    self[key] = value
 
             return
 
@@ -35,7 +51,9 @@ class Element(dict):
         if attributes:
             self["attributes"] = attributes
         if children:
-            self["children"] = children
+            self["children"] = [
+                Element(child, level=(level + 1)) for child in children
+            ]
         if text:
             self["text"] = text
 
@@ -47,6 +65,7 @@ class Element(dict):
 
     @property
     def tag(self):
+        "Returns the element's tag name"
         return self.get("tag")
 
     @property
@@ -60,6 +79,10 @@ class Element(dict):
     @property
     def text(self):
         return self.get("text")
+
+    @property
+    def level(self):
+        return self._level
 
     @tag.setter
     def tag(self, value):
@@ -126,31 +149,31 @@ class Element(dict):
         return True
 
     def _get_children_str(self, parent: Type["Element"]) -> str:
-        return [str(child) + "\n" for child in parent.children]
+        return [str(child) for child in parent.children]
+
+    def _get_attr_str(self):
+        if not self.attributes:
+            return ""
+        return " ".join([f'{key}="{value}"' for key, value in self.attributes.items()])
 
     def _clean(self, value: str) -> str:
-        return (
-            value.replace("u'", "'")
-            .replace("'<", "<")
-            .replace(">'", ">")
-            .replace("']", "]")
-        )
+        return value.replace("u'", "'").replace("'<", "<").replace(">'", ">")
 
-    def __str__(self):
-        if self.attributes and self.children:
-            return self._clean(
-                make_repr("tag", "attributes", children=self._get_children_str)(self)
-            )
-        elif self.attributes and self.text:
-            return self._clean(make_repr("tag", "attributes", "text")(self))
-        elif self.attributes:
-            return self._clean(make_repr("tag", "attributes")(self))
-        elif self.children:
-            return self._clean(make_repr("tag", children=self._get_children_str)(self))
-        elif self.text:
-            return self._clean(make_repr("tag", "text")(self))
+    # def __str__(self):
+    #    if self.attributes and self.children:
+    #        return self._clean(
+    #            make_repr("tag", "attributes", children=self._get_children_str)(self)
+    #        )
+    #    elif self.attributes and self.text:
+    #        return self._clean(make_repr("tag", "attributes", "text")(self))
+    #    elif self.attributes:
+    #        return self._clean(make_repr("tag", "attributes")(self))
+    #    elif self.children:
+    #        return self._clean(make_repr("tag", children=self._get_children_str)(self))
+    #    elif self.text:
+    #        return self._clean(make_repr("tag", "text")(self))
 
-        return make_repr("tag")(self)
+    #    return make_repr("tag")(self)
 
     def __repr__(self):
         tag = self.tag
@@ -158,11 +181,50 @@ class Element(dict):
         children = self.children
         text = self.text
 
-        args = [f"tag={tag}"]
-        args.append(f"attributes={attributes}") if attributes else None
+        args = [f'tag="{tag}"']
+
+        if attributes:
+            attr = str(attributes).replace("'", '"')
+            args.append(f"attributes={attr}")
         args.append(f"children={children}") if children else None
-        args.append(f"text={text}") if text else None
+        args.append(f'text="{text}"') if text else None
 
         arg_list = ", ".join(args)
 
         return f"Element({arg_list})"
+
+    def to_xml(self):
+        is_self_closed = not self.children and not self.text
+
+        if self.children:
+            content = [child.to_xml() for child in self.children]
+            content = (
+                str(content)
+                .replace("'", "")
+                .replace("[", "")
+                .replace("]", "")
+                .replace(", ", "")
+            )
+        elif self.text:
+            content = self.text
+        else:
+            content = ""
+
+        if self.attributes:
+            open_tag_content = " ".join([self.tag, self._get_attr_str()])
+        else:
+            open_tag_content = self.tag
+
+        if is_self_closed:
+            open_tag = f"<{open_tag_content} />"
+            close_tag = ""
+        else:
+            open_tag = f"<{open_tag_content}>"
+            close_tag = f"</{self.tag}>"
+
+        return f"{open_tag}{content}{close_tag}"
+
+    def __str__(self):
+        result = self.to_xml()
+
+        return result
