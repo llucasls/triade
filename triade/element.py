@@ -1,7 +1,8 @@
-from typing import List, Dict, Type
 import re
 
-from magic_repr import make_repr
+from typing import List, Dict, Type
+
+from bs4 import BeautifulSoup
 
 
 class Element(dict):
@@ -9,6 +10,7 @@ class Element(dict):
     attributes: Dict[str, str]
     children: List["Element"]
     text: str
+    _re = re.compile("^( +)")
 
     def __init__(
         self,
@@ -20,8 +22,10 @@ class Element(dict):
         *,
         tag=None,
         level=0,
+        indent_level=4,
     ):
         self._level = level
+        self._indent = indent_level
 
         if isinstance(element, dict):
             if tag or attributes or children or text:
@@ -196,11 +200,11 @@ class Element(dict):
 
         return f"Element({arg_list})"
 
-    def to_xml(self):
+    def _to_xml(self):
         is_self_closed = not self.children and not self.text
 
         if self.children:
-            content = [child.to_xml() for child in self.children]
+            content = [child._to_xml() for child in self.children]
             content = (
                 str(content)
                 .replace("'", "")
@@ -227,7 +231,15 @@ class Element(dict):
 
         return f"{open_tag}{content}{close_tag}"
 
-    def __str__(self):
-        result = self.to_xml()
+    def indent(self, value):
+        "Change the number of spaces of indentation"
+        self._indent = value
 
-        return result
+    def __str__(self):
+        pattern = self._re
+        xml = BeautifulSoup(self._to_xml(), features="xml").prettify().strip()
+        lines = []
+        for line in xml.split("\n"):
+            lines.append(re.sub(pattern, r"\1" * self._indent, line))
+
+        return "\n".join(lines)
