@@ -10,3 +10,5 @@ pytest-mock
 pytest-mocha
 
 repr
+lxml
+beautifulsoup4
