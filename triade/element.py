@@ -65,19 +65,22 @@ class Element(dict):
 
     @property
     def tag(self):
-        "Returns the element's tag name"
+        "The element's tag"
         return self.get("tag")
 
     @property
     def attributes(self):
+        "A dictionary of attributes"
         return self.get("attributes")
 
     @property
     def children(self):
+        "A list of child elements"
         return self.get("children")
 
     @property
     def text(self):
+        "The element's text"
         return self.get("text")
 
     @property
