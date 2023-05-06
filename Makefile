@@ -52,6 +52,7 @@ install:
 
 $(VENV): dev_requirements.txt
 	if test ! -d $(VENV); then $(PYTHON) -m venv $(VENV); fi
+	$(ACTIVATE) && $(PIP) install --upgrade pip
 	$(ACTIVATE) && $(PIP) install --upgrade -r dev_requirements.txt
 	touch $(VENV)
 
