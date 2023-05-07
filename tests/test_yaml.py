@@ -5,7 +5,7 @@ class TestYAML:
     "Test YAML format"
 
     def test_write(self):
-        "return YAML string from Python object"
+        "test_write :: return YAML string from Python object"
 
         input_data = [
             {
@@ -30,7 +30,7 @@ class TestYAML:
         assert output_data == expected_output
 
     def test_parse(self):
-        "return Python object from YAML string"
+        "test_parse :: return Python object from YAML string"
 
         input_data = """- dessert: vanilla ice cream
   drink: Coca Cola

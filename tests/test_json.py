@@ -5,7 +5,7 @@ class TestJSON:
     "Test JSON format"
 
     def test_write(self):
-        "return JSON string from Python object"
+        "test_write :: return JSON string from Python object"
 
         input_data = [
             {
@@ -26,7 +26,7 @@ class TestJSON:
         assert output_data == expected_output
 
     def test_parse(self):
-        "return Python object from JSON string"
+        "test_parse :: return Python object from JSON string"
 
         input_data = '[{"sandwich": "Big Mac", "drink": "Coca Cola", "dessert": "vanilla ice cream"}, {"sandwich": "Mc Chicken", "drink": "vanilla McShake", "dessert": "apple pie"}]'
         output_data = parse(input_data, "json")

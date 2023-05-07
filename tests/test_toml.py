@@ -5,7 +5,7 @@ class TestTOML:
     "Test TOML format"
 
     def test_write(self):
-        "return TOML string from Python object"
+        "test_write :: return TOML string from Python object"
 
         input_data = {"order": [
             {
@@ -34,7 +34,7 @@ dessert = "apple pie"'''
         assert output_data == expected_output
 
     def test_parse(self):
-        "return Python object from TOML string"
+        "test_parse :: return Python object from TOML string"
 
         input_data = '''[[order]]
 sandwich = "Big Mac"
