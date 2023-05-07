@@ -39,4 +39,4 @@ class TestElement:
                 children=[Element("p", text="This is the first paragraph"),
                           Element("p", text="This is the second one")])
 
-    Element("span", text="some text")
+        Element("span", text="some text")
