@@ -1,15 +1,24 @@
-import xml.etree.ElementTree as ET
-
-from element import Element
+from element import Element, NotAnElementError
 
 
 class XML:
     @staticmethod
-    def loads(input_data: str) -> object:
+    def loads(input_data: str) -> dict:
         "Parse XML string into Python object"
-        pass
+
+        element = Element.from_xml_string(input_data)
+
+        if not Element.is_element(element):
+            error_msg = "The given string can't be converted to XML"
+            raise NotAnElementError(error_msg)
+
+        return element
 
     @staticmethod
-    def dumps(input_data: object) -> str:
+    def dumps(input_data: dict) -> str:
         "Converts Python object into XML string"
-        pass
+
+        if not Element.is_element(input_data):
+            raise NotAnElementError("The given object is not a valid element")
+
+        return str(Element(input_data))
