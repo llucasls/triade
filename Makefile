@@ -76,6 +76,9 @@ $(PACKAGE_DIR):
 $(PACKAGE_DIR)/%.py: triade/%.py | $(PACKAGE_DIR)
 	ln $< $@
 
+test_%: tests/test_%.py
+	$(ACTIVATE) && $(PYTEST) $(PYTEST_FLAGS) $<
+
 .PHONY: build check publish clean install test coverage tar
 
 .SILENT: build check publish install test coverage $(VENV) this
