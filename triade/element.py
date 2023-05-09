@@ -5,6 +5,10 @@ from typing import List, Dict, Type
 from bs4 import BeautifulSoup
 
 
+class NotAnElementError(ValueError):
+    pass
+
+
 class Element(dict):
     tag: str
     attributes: Dict[str, str]
@@ -65,7 +69,7 @@ class Element(dict):
             raise ValueError("Element cannot have children and text at the same time")
 
         if not self.is_element(self):
-            raise ValueError("The given object is not a valid element")
+            raise NotAnElementError("The given object is not a valid element")
 
     @property
     def tag(self):
