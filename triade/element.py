@@ -235,6 +235,31 @@ class Element(dict):
 
         return f"{open_tag}{content}{close_tag}"
 
+    # TODO: create Element instance from xml string
+    @classmethod
+    def from_xml_string(cls, xml_string):
+        "Create new element from an XML formatted string"
+
+        xml_declaration = '<?xml version="1.0" encoding="utf-8"?>'
+
+        value = xml_string.replace(xml_declaration, "")
+
+        index = value.find(">")
+
+        value = value[1:index].replace("/", "").strip()
+
+        return cls(value)
+
+    def _get_tag(self, value: str) -> str:
+        xml_declaration = '<?xml version="1.0" encoding="utf-8"?>'
+
+        value = value.replace(xml_declaration, "")
+
+        index = value.find(">")
+
+        return ""
+
+
     def indent(self, value):
         "Change the number of spaces of indentation"
         self._indent = value
@@ -247,3 +272,10 @@ class Element(dict):
             lines.append(re.sub(pattern, r"\1" * self._indent, line))
 
         return "\n".join(lines)
+
+xml_declaration = '<?xml version="1.0" encoding="utf-8"?>'
+
+xml = "<bone />"
+element = Element.from_xml_string(xml)
+
+print(element)
