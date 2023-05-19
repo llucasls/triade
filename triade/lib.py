@@ -21,7 +21,7 @@ parsers = {
 }
 
 writers = {
-    "json": json.dumps,
+    "json": lambda data: json.dumps(data, ensure_ascii=False),
     "yaml": lambda data: yaml.dump(data, Dumper=yaml.SafeDumper,
                                    allow_unicode=True),
     "toml": write_toml,
