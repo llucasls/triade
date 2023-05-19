@@ -25,6 +25,20 @@ class TestJSON:
 
         assert output_data == expected_output
 
+    def test_write_utf_8(self):
+        "test_write :: return JSON with unicode characters"
+
+        input_data = [
+            {"material": "ônix"},
+            {"material": "âmbar"},
+            {"material": "topázio"}
+        ]
+        output_data = write(input_data, "json")
+
+        expected_output = '[{"material": "ônix"}, {"material": "âmbar"}, {"material": "topázio"}]'
+
+        assert output_data == expected_output
+
     def test_parse(self):
         "test_parse :: return Python object from JSON string"
 
