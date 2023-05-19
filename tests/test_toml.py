@@ -33,6 +33,27 @@ dessert = "apple pie"'''
 
         assert output_data == expected_output
 
+    def test_write_utf_8(self):
+        "test_write :: return TOML with unicode characters"
+
+        input_data = {"materiais": [
+            {"material": "ônix"},
+            {"material": "âmbar"},
+            {"material": "topázio"}
+        ]}
+        output_data = write(input_data, "toml")
+
+        expected_output = '''[[materiais]]
+material = "ônix"
+
+[[materiais]]
+material = "âmbar"
+
+[[materiais]]
+material = "topázio"'''
+
+        assert output_data == expected_output
+
     def test_parse(self):
         "test_parse :: return Python object from TOML string"
 
