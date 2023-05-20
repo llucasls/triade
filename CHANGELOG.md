@@ -1,3 +1,9 @@
+## 0.2.1 - 2023-05-20
+
+### Fixed
+
+- Fixed special unicode characters on JSON output
+
 ## 0.2.0 - 2023-04-28
 
 ### Added
