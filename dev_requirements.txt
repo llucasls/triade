@@ -3,6 +3,7 @@ PyYAML
 
 bumpline
 black
+twine
 
 pytest
 pytest-cov

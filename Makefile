@@ -42,7 +42,7 @@ check: | dist
 	$(TWINE) check dist/*
 
 publish: build
-	$(TWINE) upload dist/*
+	$(ACTIVATE) && $(TWINE) upload dist/*
 
 clean: | dist
 	rm -rf dist/*
