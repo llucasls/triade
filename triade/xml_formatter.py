@@ -1,4 +1,4 @@
-from element import Element, NotAnElementError
+from triade.element import Element, NotAnElementError
 
 
 class XML:
