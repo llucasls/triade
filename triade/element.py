@@ -272,10 +272,3 @@ class Element(dict):
             lines.append(re.sub(pattern, r"\1" * self._indent, line))
 
         return "\n".join(lines)
-
-xml_declaration = '<?xml version="1.0" encoding="utf-8"?>'
-
-xml = "<bone />"
-element = Element.from_xml_string(xml)
-
-print(element)
