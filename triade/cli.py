@@ -4,7 +4,7 @@ import argparse
 from triade.lib import parse, write
 
 
-FORMAT_LIST = ["json", "yaml", "toml"]
+FORMAT_LIST = ["json", "yaml", "toml", "xml"]
 
 
 def main():

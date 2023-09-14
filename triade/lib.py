@@ -4,6 +4,8 @@ import json
 import yaml
 import toml
 
+from triade.xml_formatter import XML
+
 
 def write_toml(input_data: object) -> str:
     if not isinstance(input_data, dict):
@@ -25,6 +27,7 @@ writers = {
     "yaml": lambda data: yaml.dump(data, Dumper=yaml.SafeDumper,
                                    allow_unicode=True),
     "toml": write_toml,
+    "xml": XML.dumps,
 }
 
 
