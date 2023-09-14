@@ -1,13 +1,12 @@
 PYTHON = python3
-BUILD  = /usr/bin/python3 -m build
-TWINE  = $(PYTHON) -m twine
-PYTEST = $(PYTHON) -m pytest
-PIP    = $(PYTHON) -m pip
 
-VENV     = $(CURDIR)/.venv
-ACTIVATE = . $(VENV)/bin/activate
+VENV   = $(CURDIR)/.venv
 
-BUMP = bumpline
+PIP    = $(VENV)/bin/pip
+BUILD  = $(VENV)/bin/python -m build
+TWINE  = $(VENV)/bin/twine
+PYTEST = $(VENV)/bin/pytest
+BUMP   = $(VENV)/bin/bumpline
 
 PYTEST_FLAGS = --verbose --mocha
 
@@ -35,14 +34,14 @@ endef
 dist:
 	mkdir dist
 
-build:
+build: $(VENV)
 	$(BUILD) $(BUILD_FLAGS)
 
 check: | dist
 	$(TWINE) check dist/*
 
 publish: build
-	$(ACTIVATE) && $(TWINE) upload dist/*
+	$(TWINE) upload dist/*
 
 clean: | dist
 	rm -rf dist/*
@@ -51,13 +50,12 @@ install:
 	$(MAKE) --always-make --no-print-directory $(VENV)
 
 $(VENV): dev_requirements.txt
-	if test ! -d $(VENV); then $(PYTHON) -m venv $(VENV); fi
-	$(ACTIVATE) && $(PIP) install --upgrade pip
-	$(ACTIVATE) && $(PIP) install --upgrade -r dev_requirements.txt
-	touch $(VENV)
+	if test ! -d "$@"; then $(PYTHON) -m venv "$@"; fi
+	$(PIP) install --upgrade pip -r $<
+	touch "$@"
 
 test: $(VENV)
-	$(ACTIVATE) && $(PYTEST) $(PYTEST_FLAGS) $(PYTEST_FILES)
+	$(PYTEST) $(PYTEST_FLAGS) $(PYTEST_FILES)
 
 coverage: $(VENV)
 	FLAGS="--cov=$(COVERAGE_DIR)"; \
@@ -77,7 +75,7 @@ $(PACKAGE_DIR)/%.py: triade/%.py | $(PACKAGE_DIR)
 	ln $< $@
 
 test_%: tests/test_%.py
-	$(ACTIVATE) && $(PYTEST) $(PYTEST_FLAGS) $<
+	$(PYTEST) $(PYTEST_FLAGS) $<
 
 .PHONY: build check publish clean install test coverage tar
 
