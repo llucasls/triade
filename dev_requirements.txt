@@ -4,6 +4,7 @@ PyYAML
 bumpline
 black
 twine
+build
 
 pytest
 pytest-cov
