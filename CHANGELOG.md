@@ -1,3 +1,9 @@
+## 0.3.0.dev1 - 2023-09-14
+
+### Added
+
+- Added support for XML output. XML input is yet to be implemented.
+
 ## 0.2.1 - 2023-05-20
 
 ### Fixed
