@@ -170,22 +170,6 @@ class Element(dict):
     def _clean(self, value: str) -> str:
         return value.replace("u'", "'").replace("'<", "<").replace(">'", ">")
 
-    # def __str__(self):
-    #    if self.attributes and self.children:
-    #        return self._clean(
-    #            make_repr("tag", "attributes", children=self._get_children_str)(self)
-    #        )
-    #    elif self.attributes and self.text:
-    #        return self._clean(make_repr("tag", "attributes", "text")(self))
-    #    elif self.attributes:
-    #        return self._clean(make_repr("tag", "attributes")(self))
-    #    elif self.children:
-    #        return self._clean(make_repr("tag", children=self._get_children_str)(self))
-    #    elif self.text:
-    #        return self._clean(make_repr("tag", "text")(self))
-
-    #    return make_repr("tag")(self)
-
     def __repr__(self):
         tag = self.tag
         attributes = self.attributes
