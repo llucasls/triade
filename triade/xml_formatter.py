@@ -18,7 +18,4 @@ class XML:
     def dumps(input_data: dict) -> str:
         "Converts Python object into XML string"
 
-        if not Element.is_element(input_data):
-            raise NotAnElementError("The given object is not a valid element")
-
         return str(Element(input_data))
