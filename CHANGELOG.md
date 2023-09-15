@@ -1,3 +1,9 @@
+## 0.3.0.dev2 - 2023-09-14
+
+### Fixed
+
+- Allow numeric input values for XML attributes and text.
+
 ## 0.3.0.dev1 - 2023-09-14
 
 ### Added
