@@ -1,28 +1,6 @@
 import xml.dom
 
 
-def create_document(name):
-    impl = xml.dom.getDOMImplementation()
-    return impl.createDocument(xml.dom.EMPTY_NAMESPACE, name, None)
-
-
-def create_attribute(name, value):
-    with create_document("temp_doc") as doc:
-        attr = doc.createAttribute(name)
-        attr.value = value
-        return attr
-
-
-def create_text_node(data):
-    with create_document("temp_doc") as doc:
-        return doc.createTextNode(data)
-
-
-def create_element(tag_name):
-    with create_document("temp_doc") as doc:
-        return doc.createElement(tag_name)
-
-
 # triade.xml_element.Thesaurus
 class Thesaurus(dict):
     """A dictionary that exhaustively searches a value from a list of keys."""
