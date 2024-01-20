@@ -8,7 +8,9 @@ import triade.errors as err
 class TriadeDocument:
     def __init__(self, data):
         self._data = data
-        self._node = self._create_document(data["tag_name"])
+        data = Thesaurus(data)
+        tag_name = data.get(["tagName", "tag_name"])
+        self._node = self._create_document(tag_name)
 
         self._root = TriadeElement(data, parent=self, document=self)
 
