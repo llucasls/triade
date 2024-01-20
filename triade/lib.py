@@ -4,7 +4,7 @@ import json
 import yaml
 import toml
 
-from triade.xml_element import TriadeDocument
+from triade.xml_lib import TriadeDocument
 
 
 def write_toml(input_data: object) -> str:
