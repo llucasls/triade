@@ -1,7 +1,9 @@
 import xml.dom
+from importlib.metadata import version
+
+import triade.errors as err
 
 
-# triade.xml_element.Thesaurus
 class Thesaurus(dict):
     """A dictionary that exhaustively searches a value from a list of keys."""
     def get(self, key, default=None):
@@ -54,7 +56,6 @@ class Thesaurus(dict):
             return False
 
 
-# triade.xml_element.TriadeDocument
 class TriadeDocument:
     def __init__(self, data):
         self._data = data
@@ -120,7 +121,6 @@ class TriadeDocument:
         return impl.createDocument(xml.dom.EMPTY_NAMESPACE, name, None)
 
 
-# triade.xml_element.TriadeElement
 class TriadeElement:
     def __init__(self, data, *, parent=None, document=None):
         self._validate(data)
@@ -209,12 +209,12 @@ class TriadeElement:
     @tagName.setter
     def tagName(self, value):
         if not isinstance(value, str):
-            raise TriadeNodeTypeError('"tagName" value must be a string.')
+            raise err.TriadeNodeTypeError('"tagName" value must be a string.')
         self._tag_name = value
 
     @tagName.deleter
     def tagName(self):
-        raise TriadeXMLException("Deleting tagName is not allowed.")
+        raise err.TriadeXMLException("Deleting tagName is not allowed.")
 
     tag_name = property(tagName.fget, tagName.fset, tagName.fdel)
 
@@ -257,13 +257,12 @@ class TriadeElement:
 
     def _validate(self, data):
         if not isinstance(data, dict):
-            raise TriadeNodeTypeError('"data" should be a dictionary.')
+            raise err.TriadeNodeTypeError('"data" should be a dictionary.')
 
         if ["tagName", "tag_name"] not in Thesaurus(data):
-            raise TriadeNodeValueError('"tagName" not found in "data".')
+            raise err.TriadeNodeValueError('"tagName" not found in "data".')
 
 
-# triade.xml_element.TriadeNodeList
 class TriadeNodeList:
     def __init__(self, data, *, parent=None, document=None):
         self._validate(data)
@@ -301,7 +300,7 @@ class TriadeNodeList:
 
     def append(self, obj, /):
         if not isinstance(obj, (dict, str)):
-            raise TriadeNodeTypeError("The appended value should be a dict or str.")
+            raise err.TriadeNodeTypeError("The appended value should be a dict or str.")
 
         if isinstance(obj, dict):
             node = TriadeElement(obj, parent=self.parent, document=self.document)
@@ -313,20 +312,19 @@ class TriadeNodeList:
 
     def _validate(self, data):
         if not isinstance(data, list):
-            raise TriadeNodeTypeError('"data" should be a list.')
+            raise err.TriadeNodeTypeError('"data" should be a list.')
 
         for node in data:
             if not isinstance(node, (dict, str)):
                 msg = 'Every value in "data" should be a dict or str.'
-                raise TriadeNodeValueError(msg)
+                raise err.TriadeNodeValueError(msg)
 
 
-# triade.xml_element.TriadeAttribute
 class TriadeAttribute:
     def __init__(self, name, value, *, element=None):
         if name.count(":") > 1:
             msg = "Attribute name should contain at most one colon."
-            raise TriadeNodeValueError(msg)
+            raise err.TriadeNodeValueError(msg)
 
         self._element = element
         self._node = self._element.document.create_attribute(name, value)
@@ -352,7 +350,7 @@ class TriadeAttribute:
     def __setitem__(self, key, value):
         if key not in ["name", "value"]:
             msg = 'The only keys allowed for TriadeAttribute are "name" and "value".'
-            raise TriadeNodeValueError(msg)
+            raise err.TriadeNodeValueError(msg)
 
         if key == "name":
             self._node.name = value
@@ -423,7 +421,6 @@ class TriadeAttribute:
     nodeValue = property(value.fget, value.fset, value.fdel)
 
 
-# triade.xml_element.TriadeNamedNodeMap
 class TriadeNamedNodeMap:
     def __init__(self, attributes, *, element=None):
         self._attrs = {}
@@ -506,7 +503,7 @@ class TriadeNamedNodeMap:
         else:
             msg = ("You can't assign a value of type %s to the \"%s\" attribute" %
                    (type(value).__name__, name))
-            raise TriadeNodeTypeError(msg)
+            raise err.TriadeNodeTypeError(msg)
 
         self._attrs[name] = TriadeAttribute(new_name, new_value)
         self._len += 1
@@ -535,10 +532,9 @@ class TriadeNamedNodeMap:
         else:
             msg = ("You can't assign a value of type %s to the \"%s\" key." %
                    (type(value).__name__, name))
-            raise TriadeNodeTypeError(msg)
+            raise err.TriadeNodeTypeError(msg)
 
 
-# triade.xml_element.TriadeTextNode
 class TriadeTextNode:
     def __init__(self, data, *, parent=None, document=None):
         self._parent = parent
@@ -580,14 +576,8 @@ class TriadeTextNode:
     def data(self):
         raise NotImplementedError("deleting not allowed.")
 
+    def toxml(self, *args, **kwargs):
+        return self._node.toxml(*args, **kwargs)
 
-# triade.xml_element.TriadeXMLException
-class TriadeXMLException(Exception): pass
-
-
-# triade.xml_element.TriadeNodeTypeError
-class TriadeNodeTypeError(TriadeXMLException, TypeError): pass
-
-
-# triade.xml_element.TriadeNodeValueError
-class TriadeNodeValueError(TriadeXMLException, ValueError): pass
+    def toprettyxml(self, *args, **kwargs):
+        return self._node.toprettyxml(*args, **kwargs)

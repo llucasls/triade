@@ -4,7 +4,7 @@ import json
 import yaml
 import toml
 
-from triade.xml_formatter import XML
+from triade.xml_element import TriadeDocument
 
 
 def write_toml(input_data: object) -> str:
@@ -14,6 +14,11 @@ def write_toml(input_data: object) -> str:
         sys.exit(1)
 
     return toml.dumps(input_data)
+
+
+def write_xml(input_data: dict[str, object]) -> str:
+    with TriadeDocument(input_data) as doc:
+        return doc.toprettyxml(indent="  ")
 
 
 parsers = {
@@ -27,7 +32,7 @@ writers = {
     "yaml": lambda data: yaml.dump(data, Dumper=yaml.SafeDumper,
                                    allow_unicode=True),
     "toml": write_toml,
-    "xml": XML.dumps,
+    "xml": write_xml,
 }
 
 
