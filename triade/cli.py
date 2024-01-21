@@ -134,6 +134,8 @@ def get_output_file(opts: opts_t) -> tuple[t.TextIO, str]:
 
     if output_format is None and len(file_name.split(".")) <= 1:
         output_format = get_default_output_format()
+    elif output_format is None:
+        output_format = file_name.split(".")[-1]
 
     if file_name in ["", "-"]:
         return sys.stdout, output_format
