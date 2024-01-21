@@ -12,6 +12,8 @@ PYTEST_FLAGS = --verbose --mocha
 
 COVERAGE_DIR = triade/
 
+export PYTHONPATH = $(CURDIR)
+
 TAR       = tar
 TAR_FLAGS = --create --file=$(SRC_ARCHIVE)
 
