@@ -225,8 +225,9 @@ class TriadeNodeList:
         for elem in data:
             if isinstance(elem, dict):
                 child_node = TriadeElement(elem, parent=parent, document=document)
-            elif isinstance(elem, str):
-                child_node = TriadeTextNode(elem, parent=parent, document=document)
+            elif isinstance(elem, (str, int, float)):
+                child_node = TriadeTextNode(str(elem), parent=parent,
+                                            document=document)
 
             self._nodes.append(child_node)
 
@@ -251,7 +252,8 @@ class TriadeNodeList:
 
     def append(self, obj, /):
         if not isinstance(obj, (dict, str)):
-            raise err.TriadeNodeTypeError("The appended value should be a dict or str.")
+            msg = "The appended value should be a dict or str."
+            raise err.TriadeNodeTypeError(msg)
 
         if isinstance(obj, dict):
             node = TriadeElement(obj, parent=self.parent, document=self.document)
@@ -266,8 +268,8 @@ class TriadeNodeList:
             raise err.TriadeNodeTypeError('"data" should be a list.')
 
         for node in data:
-            if not isinstance(node, (dict, str)):
-                msg = 'Every value in "data" should be a dict or str.'
+            if not isinstance(node, (dict, str, int, float)):
+                msg = 'Every value in "data" should be a dict, str, int or float.'
                 raise err.TriadeNodeValueError(msg)
 
 
@@ -379,7 +381,8 @@ class TriadeNamedNodeMap:
         self._element = element
 
         for name, value in attributes.items():
-            self._attrs[name] = TriadeAttribute(name, value, element=element)
+            self._attrs[name] = TriadeAttribute(name, str(value),
+                                                element=element)
             self._len += 1
 
     def __str__(self):
