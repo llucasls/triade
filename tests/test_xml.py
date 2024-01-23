@@ -147,3 +147,39 @@ class TestDocument:
 
         with xml.TriadeDocument(input_data) as document:
             assert document
+
+    def test_create_document_with_null_list_of_child_nodes(self):
+        """test_class ::
+        return object with None as list of child nodes"""
+
+        input_data = {"tagName": "GameConfig", "childNodes": None}
+
+        with xml.TriadeDocument(input_data) as document:
+            assert document
+
+    def test_create_document_with_null_child_nodes(self):
+        """test_class ::
+        return object with None as child nodes"""
+
+        input_data = {"tagName": "GameConfig", "childNodes": [None, None]}
+
+        with xml.TriadeDocument(input_data) as document:
+            assert document
+
+    def test_create_document_with_null_attribute_list(self):
+        """test_class ::
+        return object with None as attribute list"""
+
+        input_data = {"tagName": "GameConfig", "attributes": None}
+
+        with xml.TriadeDocument(input_data) as document:
+            assert document
+
+    def test_create_document_with_null_attributes(self):
+        """test_class ::
+        return object with None as attribute values"""
+
+        input_data = {"tagName": "GameConfig", "attributes": {"comment": None}}
+
+        with xml.TriadeDocument(input_data) as document:
+            assert document
