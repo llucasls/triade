@@ -83,6 +83,9 @@ class TriadeElement:
         self._tag_name = data.get(["tagName", "tag_name"])
 
         child_nodes = data.get(["childNodes", "child_nodes"], [])
+        if child_nodes is None:
+            child_nodes = []
+
         self._children = TriadeNodeList(child_nodes, parent=self,
                                         document=document)
 
@@ -223,6 +226,8 @@ class TriadeNodeList:
 
         self._nodes = []
         for elem in data:
+            if elem is None:
+                continue
             if isinstance(elem, dict):
                 child_node = TriadeElement(elem, parent=parent, document=document)
             elif isinstance(elem, (str, int, float)):
@@ -268,6 +273,8 @@ class TriadeNodeList:
             raise err.TriadeNodeTypeError('"data" should be a list.')
 
         for node in data:
+            if node is None:
+                continue
             if not isinstance(node, (dict, str, int, float)):
                 msg = 'Every value in "data" should be a dict, str, int or float.'
                 raise err.TriadeNodeValueError(msg)
@@ -380,6 +387,11 @@ class TriadeNamedNodeMap:
         self._len = 0
         self._element = element
 
+        if attributes is None:
+            attributes = {}
+
+        self._validate(attributes)
+
         for name, value in attributes.items():
             self._attrs[name] = TriadeAttribute(name, str(value),
                                                 element=element)
@@ -487,6 +499,12 @@ class TriadeNamedNodeMap:
             msg = ("You can't assign a value of type %s to the \"%s\" key." %
                    (type(value).__name__, name))
             raise err.TriadeNodeTypeError(msg)
+
+    def _validate(self, attributes):
+        if not isinstance(attributes, (dict, list)):
+            raise TriadeNodeTypeError("Input for attribute list should be a dictionary.")
+        elif isinstance(attributes, list):
+            raise NotImplementedError("Methods for treating list input are not implemented yet")
 
 
 class TriadeTextNode:
