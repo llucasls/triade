@@ -183,7 +183,7 @@ class TriadeElement:
 
     @childNodes.deleter
     def childNodes(self):
-        raise NotImplementedError("Clear all the child nodes, maybe")
+        self._children = []
 
     child_nodes = property(childNodes.fget, childNodes.fset, childNodes.fdel)
 
@@ -198,7 +198,7 @@ class TriadeElement:
 
     @attributes.deleter
     def attributes(self):
-        raise NotImplementedError("Clear all the attributes, maybe")
+        self._attrs = {}
 
     def append(self, obj, /):
         self._children.append(obj)
