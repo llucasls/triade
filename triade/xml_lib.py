@@ -135,7 +135,8 @@ class TriadeElement:
 
     def __setitem__(self, key, value):
         if key in ["tagName", "tag_name"]:
-            raise NotImplementedError("reassignment not allowed")
+            msg = "Tag name reassignment is not allowed"
+            raise err.TriadeForbiddenWriteError(msg)
 
     def __delitem__(self, key):
         pass
@@ -179,7 +180,8 @@ class TriadeElement:
 
     @childNodes.setter
     def childNodes(self, _):
-        raise TypeError("Reassignment not allowed.")
+        msg = "Reassignment of child nodes list is not allowed."
+        raise err.TriadeForbiddenWriteError(msg)
 
     @childNodes.deleter
     def childNodes(self):
@@ -194,7 +196,8 @@ class TriadeElement:
 
     @attributes.setter
     def attributes(self, _):
-        raise TypeError("Reassignment not allowed.")
+        msg = "Reassignment of attributes list is not allowed"
+        raise err.TriadeForbiddenWriteError(msg)
 
     @attributes.deleter
     def attributes(self):
@@ -300,7 +303,7 @@ class TriadeAttribute:
     def __getitem__(self, key):
         if key not in ["name", "value"]:
             msg = "The key %s is not present in TriadeAttribute." % (key,)
-            raise KeyError(msg)
+            raise err.TriadeNodeKeyError(msg)
 
         if key == "name":
             return self._node.name
@@ -310,7 +313,7 @@ class TriadeAttribute:
     def __setitem__(self, key, value):
         if key not in ["name", "value"]:
             msg = 'The only keys allowed for TriadeAttribute are "name" and "value".'
-            raise err.TriadeNodeValueError(msg)
+            raise err.TriadeNodeKeyError(msg)
 
         if key == "name":
             self._node.name = value
@@ -318,7 +321,7 @@ class TriadeAttribute:
             self._node.value = value
 
     def __delitem__(self, key):
-        NotImplementedError("deletion not allowed")
+        raise err.TriadeForbiddenDeleteError("Deletion not allowed")
 
     @property
     def element(self):
@@ -343,7 +346,7 @@ class TriadeAttribute:
 
     @name.deleter
     def name(self):
-        raise NotImplementedError("deletion not allowed")
+        raise err.TriadeForbiddenDeleteError("Deletion not allowed")
 
     @property
     def value(self):
@@ -356,7 +359,7 @@ class TriadeAttribute:
 
     @value.deleter
     def value(self):
-        raise NotImplementedError("deletion not allowed")
+        raise err.TriadeForbiddenDeleteError("Deletion not allowed")
 
     @property
     def node(self):
@@ -501,10 +504,9 @@ class TriadeNamedNodeMap:
             raise err.TriadeNodeTypeError(msg)
 
     def _validate(self, attributes):
-        if not isinstance(attributes, (dict, list)):
-            raise TriadeNodeTypeError("Input for attribute list should be a dictionary.")
-        elif isinstance(attributes, list):
-            raise NotImplementedError("Methods for treating list input are not implemented yet")
+        if not isinstance(attributes, dict):
+            msg = "Input for TriadeNamedNodeMap should be a dictionary."
+            raise TriadeNodeTypeError(msg)
 
 
 class TriadeTextNode:
@@ -546,7 +548,7 @@ class TriadeTextNode:
 
     @data.deleter
     def data(self):
-        raise NotImplementedError("deleting not allowed.")
+        raise err.TriadeForbiddenDeleteError("Deletion not allowed")
 
     def toxml(self, *args, **kwargs):
         return self._node.toxml(*args, **kwargs)
