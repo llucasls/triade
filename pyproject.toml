@@ -28,8 +28,6 @@ classifiers = [
 dependencies = [
   "PyYAML",
   "toml",
-  "lxml",
-  "beautifulsoup4",
 ]
 
 [project.scripts]

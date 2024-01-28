@@ -10,6 +10,3 @@ pytest
 pytest-cov
 pytest-mock
 pytest-mocha
-
-lxml
-beautifulsoup4
