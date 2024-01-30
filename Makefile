@@ -32,7 +32,7 @@ publish: build
 	$(TWINE) upload dist/*
 
 clean: dist
-	rm -rf dist/*
+	rm -f dist/*
 
 install: $(VENV)
 

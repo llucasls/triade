@@ -1,19 +1,25 @@
 import sys
 import json
+from typing import Any
 
 import yaml
 import toml
 
-from triade.xml_formatter import XML
+from triade.xml_lib import TriadeDocument
 
 
-def write_toml(input_data: object) -> str:
+def write_toml(input_data: Any) -> str:
     if not isinstance(input_data, dict):
         print("Error: input data for TOML writer should be a dictionary",
               file=sys.stderr)
         sys.exit(1)
 
     return toml.dumps(input_data)
+
+
+def write_xml(input_data: dict[str, Any]) -> str:
+    with TriadeDocument(input_data) as doc:
+        return doc.toprettyxml(indent="  ")
 
 
 parsers = {
@@ -27,13 +33,13 @@ writers = {
     "yaml": lambda data: yaml.dump(data, Dumper=yaml.SafeDumper,
                                    allow_unicode=True),
     "toml": write_toml,
-    "xml": XML.dumps,
+    "xml": write_xml,
 }
 
 
-def parse(input_data: str, data_format: str) -> object:
+def parse(input_data: str, data_format: str) -> Any:
     if data_format not in parsers:
-        raise ValueError("format not recognized")
+        raise ValueError("input format not recognized")
 
     output_data = parsers[data_format](input_data)
 
@@ -43,8 +49,8 @@ def parse(input_data: str, data_format: str) -> object:
     return output_data
 
 
-def write(input_data: object, data_format: str) -> str:
+def write(input_data: Any, data_format: str) -> str:
     if data_format not in writers:
-        raise ValueError("format not recognized")
+        raise ValueError("output format not recognized")
 
     return writers[data_format](input_data).strip()

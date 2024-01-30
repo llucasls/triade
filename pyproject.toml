@@ -6,13 +6,14 @@ build-backend = "hatchling.build"
 exclude = [
     "tests/",
     "Makefile",
+    "GNUmakefile",
     "dev_requirements.txt",
     ".?*",
 ]
 
 [project]
 name = "triade"
-version = "0.3.0.dev2"
+version = "0.3.0"
 authors = [
   { name="Lucas L. S. Haine", email="lucaslshaine@gmail.com" },
 ]
@@ -28,8 +29,6 @@ classifiers = [
 dependencies = [
   "PyYAML",
   "toml",
-  "lxml",
-  "beautifulsoup4",
 ]
 
 [project.scripts]

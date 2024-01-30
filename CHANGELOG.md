@@ -1,14 +1,11 @@
-## 0.3.0.dev2 - 2023-09-14
-
-### Fixed
-
-- Allow numeric input values for XML attributes and text.
-
-## 0.3.0.dev1 - 2023-09-14
+## 0.3.0 - 2024-01-30
 
 ### Added
-
-- Added support for XML output. XML input is yet to be implemented.
+- Added support for XML output.
+- Integrate library with Python's "xml.dom" builtin library. This allows the
+creation of elements with multiple text nodes alongside other child elements
+with a simple API.
+- Convert str, int and float nodes into text nodes.
 
 ## 0.2.1 - 2023-05-20
 
