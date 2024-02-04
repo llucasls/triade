@@ -49,6 +49,43 @@ class TestCLIScript:
         assert status == SUCCESS
         assert stream.read() == "%s\n" % (VERSION)
 
+    def test_triade_I_xml_O_yaml(self):
+        """test_script triade -I xml -O yaml ::
+        take an XML document from stdin and print it as YAML"""
+        with open("tests/fixtures/test_xml/doc03.xml", "r") as file:
+            input_data = file.read()
+
+        expected_output = """childNodes:
+- attributes:
+    name: petroleum
+  childNodes:
+  - '78'
+  tagName: commodity
+- attributes:
+    name: coffee
+  childNodes:
+  - '185'
+  tagName: commodity
+- attributes:
+    name: gold
+  childNodes:
+  - '2023'
+  tagName: commodity
+- attributes:
+    name: cocoa
+  childNodes:
+  - '4603'
+  tagName: commodity
+tagName: commodities
+"""
+
+        argv = ["triade", "-I", "xml", "-O", "yaml"]
+        with CustomIO(argv, stdin=input_data, stdout=True) as result:
+            status = cli.main()
+
+        assert status == SUCCESS
+        assert result.stdout == expected_output
+
 
 class TestCLIFunctions:
     """Test the package's cli helper functions"""
