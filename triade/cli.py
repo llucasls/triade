@@ -171,5 +171,7 @@ def main():
         output_file.write(output_data.strip())
         output_file.write("\n")
     finally:
-        input_file.close()
-        output_file.close()
+        if input_file is not sys.stdin:
+            input_file.close()
+        if output_file is not sys.stdout:
+            output_file.close()
