@@ -46,7 +46,6 @@ options:
         Not implemented yet.
 """
 import sys
-import argparse
 from getopt import gnu_getopt, GetoptError
 import io
 import typing as t
