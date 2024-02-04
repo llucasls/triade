@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<commodities>
+  <commodity name="petroleum">78</commodity>
+  <commodity name="coffee">185</commodity>
+  <commodity name="gold">2023</commodity>
+  <commodity name="cocoa">4603</commodity>
+</commodities>

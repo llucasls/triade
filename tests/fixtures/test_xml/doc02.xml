@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<distributions>
+  <distro name="Ubuntu" packageManager="apt"/>
+  <distro name="Manjaro" packageManager="pacman"/>
+</distributions>
