@@ -6,11 +6,10 @@ usage:
     triade [-i] [-o OUTPUT_FILE] [-I INPUT_FORMAT] [-O OUTPUT_FORMAT] <FILE>
 
 description:
-    Triade allows you to convert data formatted as JSON, YAML, TOML and XML. As
-    of the moment, it doesn't read XML data, only prints it from other formats.
-    By giving a file name on the command line, 'triade' will read said file,
-    convert to another format based on the chosen format or the output file
-    name.
+    Triade allows you to convert data formatted as JSON, YAML, TOML and XML.
+    By giving a file name on the command line, 'triade' will read it and
+    convert the data to another format based on the chosen format or the output
+    file name.
 
     If no input file name is given, and standard input is not a terminal, then
     data will be read from stdin. In that case, the '-I' option is necessary.
@@ -26,15 +25,23 @@ positional arguments:
 
 options:
     -h, --help
-        Show this help message and exit
+        Show this help message and exit.
+
+    -v, --version
+        Show version number.
+
     -o OUTPUT_FILE, --output-file OUTPUT_FILE
         Choose an output file to write the data. If the file is '-', the data
         will be written to standard output.
+
     -I INPUT_FORMAT, --input-format INPUT_FORMAT
         Specify the input format. This option is required if the data is read
         from standard input.
+
     -O OUTPUT_FORMAT, --output-format OUTPUT_FORMAT
-        Specify the output format.
+        Specify the output format. This options is required if the data is
+        written to standard output.
+
     -i, --interactive
         Not implemented yet.
 """
