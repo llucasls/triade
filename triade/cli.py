@@ -176,6 +176,8 @@ def main():
 
         output_file.write(output_data.strip())
         output_file.write("\n")
+
+        return 0
     finally:
         if input_file is not sys.stdin:
             input_file.close()
