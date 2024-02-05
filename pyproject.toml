@@ -8,6 +8,7 @@ exclude = [
     "Makefile",
     "GNUmakefile",
     "dev_requirements.txt",
+    "TODO.txt",
     ".?*",
 ]
 
