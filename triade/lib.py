@@ -8,6 +8,11 @@ import toml
 from triade.xml_lib import TriadeDocument
 
 
+def read_xml(input_data: str) -> dict:
+    with TriadeDocument.fromxml(input_data) as document:
+        return document.data
+
+
 def write_toml(input_data: Any) -> str:
     if not isinstance(input_data, dict):
         print("Error: input data for TOML writer should be a dictionary",
@@ -26,6 +31,7 @@ parsers = {
     "json": json.loads,
     "yaml": yaml.safe_load,
     "toml": toml.loads,
+    "xml": read_xml,
 }
 
 writers = {

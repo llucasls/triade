@@ -1,14 +1,92 @@
+import os
+import io
 import xml.dom
-from importlib.metadata import version
+from xml.dom.minidom import parse as _parse
 
 from triade.thesaurus import Thesaurus
 import triade.errors as err
 
 
+def check_node_lvl(node_lvl: int, strict=False):
+    msg = "Invalid document. You either opened or closed one too many tags."
+    if node_lvl not in [0, 1]:
+        raise ValueError(msg)
+    if node_lvl != 0 and strict:
+        raise ValueError(msg)
+
+
+def trim_xml(xmldoc: str):
+    """Remove unwanted whitespace from a XML string."""
+    node_lvl = 0
+    index = -1
+    buffers = []
+
+    try:
+        for char in xmldoc:
+            index += 1
+
+            if char == "<":
+                node_lvl += 1
+                check_node_lvl(node_lvl)
+                buffers.append(io.StringIO())
+                buffers[-1].write("<")
+            elif char == ">":
+                node_lvl -= 1
+                check_node_lvl(node_lvl)
+                buffers[-1].write(">")
+                buffers.append(io.StringIO())
+            else:
+                buffers[-1].write(char)
+
+        check_node_lvl(node_lvl, strict=True)
+
+        result = "".join([buffer.getvalue().strip() for buffer in buffers])
+
+        return result
+    finally:
+        for buffer in buffers:
+            buffer.close()
+
+
+def parse_xml(xml_document: str, parser=None, bufsize=None):
+    """Parse an XML string into a DOM document node object."""
+    return _parse(io.StringIO(trim_xml(xml_document)), parser, bufsize)
+
+
+def document_to_dict(node):
+    """Create an XML-parsable dictionary from a xml.dom node object."""
+    if node.nodeType == node.DOCUMENT_NODE:
+        try:
+            return document_to_dict(node.documentElement)
+        finally:
+            node.unlink()
+    elif node.nodeType == node.TEXT_NODE:
+        return node.data.strip()
+
+    node_dict = {"tagName": node.tagName}
+
+    if node.hasAttributes():
+        node_dict["attributes"] = {a.name: a.value for a in
+                                   node.attributes.values()}
+
+    if node.hasChildNodes():
+        child_nodes = []
+        for child_node in node.childNodes:
+            if child_node.nodeType == child_node.TEXT_NODE:
+                child_nodes.append(child_node.data.strip())
+
+            elif child_node.nodeType == child_node.ELEMENT_NODE:
+                child_nodes.append(document_to_dict(child_node))
+
+        node_dict["childNodes"] = child_nodes
+
+    return node_dict
+
+
 class TriadeDocument:
     def __init__(self, data):
-        self._data = data
         data = Thesaurus(data)
+        self._data = data
         tag_name = data.get(["tagName", "tag_name"])
         self._node = self._create_document(tag_name)
 
@@ -29,6 +107,15 @@ class TriadeDocument:
         self._node.unlink()
         return False
 
+    @classmethod
+    def fromxml(cls, xmldoc: str):
+        return cls(document_to_dict(parse_xml(xmldoc)))
+
+    @property
+    def data(self):
+        """The dictionary used to construct this document."""
+        return self._data
+
     @property
     def node(self):
         """The XML DOM Document object associated with this object."""
@@ -38,6 +125,10 @@ class TriadeDocument:
     def root(self):
         """The root TriadeElement associated with this document."""
         return self._root
+
+    @root.setter
+    def root(self, element):
+        self._root = element
 
     @property
     def parent(self):
@@ -62,6 +153,9 @@ class TriadeDocument:
         return self._node.toxml(*args, **kwargs)
 
     def toprettyxml(self, *args, **kwargs):
+        if "indent" not in kwargs:
+            kwargs["indent"] = "  "
+
         return self._node.toprettyxml(*args, **kwargs)
 
     def unlink(self):
@@ -77,25 +171,30 @@ class TriadeElement:
         self._validate(data)
         data = Thesaurus(data)
         self._data = data
-        self._parent = parent
-        self._document = document
+        self._doc = self._get_document(document)
+        self._parent = self._get_parent(parent)
 
         self._tag_name = data.get(["tagName", "tag_name"])
+        for char in self._tag_name:
+            if char.isspace():
+                msg = "The tagName parameter cannot have any whitespace characters"
+                raise err.TriadeNodeValueError(msg)
 
         child_nodes = data.get(["childNodes", "child_nodes"], [])
         if child_nodes is None:
             child_nodes = []
 
         self._children = TriadeNodeList(child_nodes, parent=self,
-                                        document=document)
+                                        document=self._doc)
 
-        if isinstance(parent, TriadeDocument):
-            self._node = parent.node.documentElement
+        if isinstance(self._parent, TriadeDocument):
+            self._node = self._parent.node.documentElement
         else:
-            self._node = document.create_element(self._tag_name)
+            self._node = self._doc.create_element(self._tag_name)
 
-        for child_node in self._children:
-            self._node.appendChild(child_node.node)
+        if document is not None:
+            for child_node in self._children:
+                self._node.appendChild(child_node.node)
 
         attributes = data.get("attributes", {})
         self._attrs = TriadeNamedNodeMap(attributes, element=self)
@@ -128,8 +227,9 @@ class TriadeElement:
         elif key == "attributes":
             return self._attrs
         elif isinstance(key, str):
-            raise KeyError('"%s" key is not present in objects of type %s.' %
-                           (key, type(self).__name__))
+            cls = type(self).__name__
+            msg = '"%s" key is not present in objects of type %s.' % (key, cls)
+            raise TriadeNodeKeyError(msg)
         else:
             return self._children[key]
 
@@ -140,6 +240,11 @@ class TriadeElement:
 
     def __delitem__(self, key):
         pass
+
+    @property
+    def data(self):
+        """The dictionary used to construct this element."""
+        return self._data
 
     @property
     def node(self):
@@ -154,7 +259,7 @@ class TriadeElement:
     @property
     def document(self):
         """The document containing this element."""
-        return self._document
+        return self._doc
 
     @property
     def tagName(self):
@@ -169,7 +274,7 @@ class TriadeElement:
 
     @tagName.deleter
     def tagName(self):
-        raise err.TriadeXMLException("Deleting tagName is not allowed.")
+        raise err.TriadeForbiddenDeleteError("Deleting tagName is not allowed.")
 
     tag_name = property(tagName.fget, tagName.fset, tagName.fdel)
 
@@ -210,6 +315,9 @@ class TriadeElement:
         return self._node.toxml(*args, **kwargs)
 
     def toprettyxml(self, *args, **kwargs):
+        if "indent" not in kwargs:
+            kwargs["indent"] = "  "
+
         return self._node.toprettyxml(*args, **kwargs)
 
     def _validate(self, data):
@@ -219,10 +327,25 @@ class TriadeElement:
         if ["tagName", "tag_name"] not in Thesaurus(data):
             raise err.TriadeNodeValueError('"tagName" not found in "data".')
 
+    def _get_document(self, document):
+        if document is not None:
+            return document
+
+        document = TriadeDocument(self._data)
+        document.root = self
+        return document
+
+    def _get_parent(self, parent):
+        if parent is not None:
+            return parent
+
+        return self._doc
+
 
 class TriadeNodeList:
     def __init__(self, data, *, parent=None, document=None):
         self._validate(data)
+        self._data = data
 
         self._parent = parent
         self._document = document
@@ -249,6 +372,11 @@ class TriadeNodeList:
         return self._nodes[index]
 
     @property
+    def data(self):
+        """The list of child nodes as dictionaries."""
+        return self._data
+
+    @property
     def parent(self):
         """This object's parent node."""
         return self._parent
@@ -273,32 +401,36 @@ class TriadeNodeList:
 
     def _validate(self, data):
         if not isinstance(data, list):
-            raise err.TriadeNodeTypeError('"data" should be a list.')
+            raise err.TriadeNodeTypeError("Input data should be a list.")
 
         for node in data:
             if node is None:
                 continue
             if not isinstance(node, (dict, str, int, float)):
-                msg = 'Every value in "data" should be a dict, str, int or float.'
+                msg = "Every value in the input list should be a dict, str, int or float."
                 raise err.TriadeNodeValueError(msg)
 
 
 class TriadeAttribute:
     def __init__(self, name, value, *, element=None):
+        self._name = name
+        self._value = value
+
         if name.count(":") > 1:
             msg = "Attribute name should contain at most one colon."
             raise err.TriadeNodeValueError(msg)
 
         self._element = element
-        self._node = self._element.document.create_attribute(name, value)
-        self.element.node.setAttribute(name, value)
+        if element is not None:
+            self._node = self._element.document.create_attribute(name, value)
+            self.element.node.setAttribute(name, value)
 
     def __str__(self):
-        return '<?attr %s="%s" ?>' % (self._node.name, self._node.value)
+        return '<?attr %s="%s" ?>' % (self._name, self._value)
 
     def __repr__(self):
         cls = type(self).__name__
-        return "%s(%s, %s)" % (cls, repr(self._node.name), repr(self._node.value))
+        return "%s(%s, %s)" % (cls, repr(self._name), repr(self._value))
 
     def __getitem__(self, key):
         if key not in ["name", "value"]:
@@ -324,12 +456,20 @@ class TriadeAttribute:
         raise err.TriadeForbiddenDeleteError("Deletion not allowed")
 
     @property
+    def data(self):
+        """A tuple containing the attribute's name and value."""
+        return self._name, self._value
+
+    @property
     def element(self):
         return self._element
 
     @property
     def document(self):
-        return self._element.document
+        try:
+            return self._element.document
+        except AttributeError:
+            return None
 
     @property
     def node(self):
@@ -338,11 +478,15 @@ class TriadeAttribute:
     @property
     def name(self):
         """The attribute's name."""
-        return self._node.name
+        return self._name
 
     @name.setter
     def name(self, new_name):
-        self._node.name = new_name
+        self._name = new_name
+        try:
+            self._node.name = new_name
+        except AttributeError:
+            pass
 
     @name.deleter
     def name(self):
@@ -351,11 +495,15 @@ class TriadeAttribute:
     @property
     def value(self):
         """The attribute's value."""
-        return self._node.value
+        return self._value
 
     @value.setter
     def value(self, new_value):
-        self._node.value = new_value
+        self._value = new_value
+        try:
+            self._node.value = new_value
+        except AttributeError:
+            pass
 
     @value.deleter
     def value(self):
@@ -364,7 +512,10 @@ class TriadeAttribute:
     @property
     def node(self):
         """The XML DOM Attr object associated with this object."""
-        return self._node
+        try:
+            return self._node
+        except AttributeError:
+            return None
 
     @property
     def localName(self):
@@ -411,13 +562,12 @@ class TriadeNamedNodeMap:
 
     def __repr__(self):
         cls = type(self).__name__
-        text = ", ".join("%s: %s" % (repr(attr.name), repr(attr.value))
-                         for attr in self._attrs.values())
+        data = self.data
+        if self._element is None:
+            return "%s(%s)" % (cls, repr(data))
 
-        if self._element is not None:
-            return "%s({%s}, %s)" % (cls, text, repr(self._element))
-
-        return "%s({%s})" % (cls, text)
+        element = self._element
+        return "%s(%s, element=%s)" %(cls, repr(data), repr(element))
 
     def __iter__(self):
         return iter(self._attrs.values())
@@ -440,6 +590,10 @@ class TriadeNamedNodeMap:
 
     def __len__(self):
         return self._len
+
+    @property
+    def data(self):
+        return {a.name: a.value for a in self.values()}
 
     def get(self, name, default=None):
         return self._attrs.get(name, default)
@@ -511,6 +665,7 @@ class TriadeNamedNodeMap:
 
 class TriadeTextNode:
     def __init__(self, data, *, parent=None, document=None):
+        self._data = data
         self._parent = parent
         self._document = document
         self._node = self._document.create_text_node(data)
@@ -540,7 +695,7 @@ class TriadeTextNode:
     @property
     def data(self):
         """The content of the text node as a string."""
-        return self._node.data
+        return self._data
 
     @data.setter
     def data(self, value):

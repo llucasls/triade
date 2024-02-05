@@ -21,9 +21,7 @@ class Thesaurus(dict):
         return default
 
     def __repr__(self):
-        cls = type(self).__name__
-        text = ", ".join("%s: %s" % (repr(k), repr(v)) for k, v in self.items())
-        return "%s({%s})" % (cls, text)
+        return "%s(%s)" % (type(self).__name__, super().__repr__())
 
     def __contains__(self, item):
         """This method allows for the use of:
