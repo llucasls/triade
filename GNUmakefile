@@ -10,34 +10,22 @@ BUMP   = $(VENV)/bin/bumpline
 
 PYTEST_FLAGS = --verbose --mocha
 
-COVERAGE_DIR = triade/
+COVERAGE_DIR = triade
 
 export PYTHONPATH = $(CURDIR)
 
-TAR       = tar
-TAR_FLAGS = --create --file=$(SRC_ARCHIVE)
-
-SRC_FILES    = pyproject.toml README.md triade/*.py
-SRC_ARCHIVE := $(shell mktemp --dry-run --suffix=.tar)
-
-PACKAGE_DIR := .venv/lib/python3.10/site-packages/triade
-
-define DELETED_FILES
-$(strip
-	$(foreach FILE,
-		$(filter-out
-		$(notdir $(wildcard triade/*.py)),
-		$(notdir $(wildcard .venv/lib/python3.10/site-packages/triade/*.py))),
-		$(CURDIR)/.venv/lib/python3.10/site-packages/triade/$(FILE)
-	)
-)
-endef
+VERSION != awk -F\" '/version/ { print $$2; }' pyproject.toml
+TARBALL := $(wildcard dist/triade-$(VERSION).tar.gz)
 
 dist:
 	mkdir dist
 
+ifdef TARBALL
+build: $(VENV)
+else
 build: $(VENV)
 	$(BUILD) $(BUILD_FLAGS)
+endif
 
 check: | dist
 	$(TWINE) check dist/*
@@ -57,28 +45,15 @@ $(VENV): dev_requirements.txt
 	touch "$@"
 
 test: $(VENV)
-	$(PYTEST) $(PYTEST_FLAGS) $(PYTEST_FILES)
+	$(PYTEST) $(PYTEST_FLAGS) $(FILES)
 
 coverage: $(VENV)
 	FLAGS="--cov=$(COVERAGE_DIR)"; \
 	$(MAKE) --no-print-directory test PYTEST_FLAGS="$${FLAGS}" 2> /dev/null
 
-tar:
-	$(TAR) --create --file=triade.tar $(SRC_FILES)
-
-this: $(VENV)
-	-rm -f $(DELETED_FILES)
-	$(MAKE) --no-print-directory $(patsubst triade/%.py,$(PACKAGE_DIR)/%.py,$(wildcard triade/*.py))
-
-$(PACKAGE_DIR):
-	@mkdir -p $(PACKAGE_DIR)
-
-$(PACKAGE_DIR)/%.py: triade/%.py | $(PACKAGE_DIR)
-	ln $< $@
-
 test_%: tests/test_%.py
 	$(PYTEST) $(PYTEST_FLAGS) $<
 
-.PHONY: build check publish clean install test coverage tar
+.PHONY: build check publish clean install test coverage
 
-.SILENT: build check publish install test coverage $(VENV) this
+.SILENT: build check publish install test coverage $(VENV)
