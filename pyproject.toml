@@ -5,6 +5,7 @@ build-backend = "hatchling.build"
 [tool.hatch.build]
 exclude = [
     "tests/",
+    "tasks/",
     "Makefile",
     "GNUmakefile",
     "dev_requirements.txt",

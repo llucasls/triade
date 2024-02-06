@@ -49,7 +49,7 @@ test: $(VENV)
 
 coverage: $(VENV)
 	if test -t 1; then color=-c; else color=-C; fi; \
-	PYTEST=$(PYTEST) $(VENV)/bin/$(PYTHON) get_coverage.py $${color}
+	PYTEST=$(PYTEST) $(VENV)/bin/$(PYTHON) tasks/get_coverage.py $${color}
 
 test_%: tests/test_%.py
 	$(PYTEST) $(PYTEST_FLAGS) $<
