@@ -18,13 +18,10 @@ def check_node_lvl(node_lvl: int, strict=False):
 def trim_xml(xmldoc: str):
     """Remove unwanted whitespace from a XML string."""
     node_lvl = 0
-    index = -1
     buffers = []
 
     try:
         for char in xmldoc:
-            index += 1
-
             if char == "<":
                 node_lvl += 1
                 check_node_lvl(node_lvl)
