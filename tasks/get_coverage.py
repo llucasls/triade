@@ -49,7 +49,7 @@ def main():
 
     total_index = next((i for i, line in enumerate(lines) if tot_pat.match(line)), None)
 
-    # add cool factor to first line
+    # simulate pytest used on the command-line
     print_chars(lines[0], delay)
     if fail_index is not None:
         for line in lines[1:fail_index]:
