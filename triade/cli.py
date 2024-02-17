@@ -183,6 +183,14 @@ def main():
         write_lines(output_data.strip(), output_file)
 
         return 0
+
+    except BrokenPipeError:
+        return 0
+
+    except OSError as err:
+        print(err, file=sys.stderr)
+        return err.errno
+
     finally:
         if input_file is not sys.stdin:
             input_file.close()
