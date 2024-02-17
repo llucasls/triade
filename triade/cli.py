@@ -155,6 +155,12 @@ def get_default_output_format() -> str:
     return "json"
 
 
+def write_lines(data: str, stream: t.TextIO):
+    for line in data.split("\n"):
+        stream.write(line)
+        stream.write("\n")
+
+
 def main():
     opts, args = parse_args()
 
@@ -174,8 +180,7 @@ def main():
         parsed_data = parse(input_data, input_format)
         output_data = write(parsed_data, output_format)
 
-        output_file.write(output_data.strip())
-        output_file.write("\n")
+        write_lines(output_data.strip(), output_file)
 
         return 0
     finally:
