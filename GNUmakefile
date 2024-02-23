@@ -48,8 +48,8 @@ test: $(VENV)
 	$(PYTEST) $(PYTEST_FLAGS) $(FILES)
 
 coverage: $(VENV)
-	FLAGS="--cov=$(COVERAGE_DIR)"; \
-	$(MAKE) --no-print-directory test PYTEST_FLAGS="$${FLAGS}" 2> /dev/null
+	if test -t 1; then color=-c; else color=-C; fi; \
+	PYTEST=$(PYTEST) $(VENV)/bin/$(PYTHON) tasks/get_coverage.py $${color}
 
 test_%: tests/test_%.py
 	$(PYTEST) $(PYTEST_FLAGS) $<
